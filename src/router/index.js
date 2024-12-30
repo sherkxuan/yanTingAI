@@ -14,37 +14,44 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
+    meta: { title: '首页' }
   },
   {
     path: '/writing',
     name: 'writing',
-    component: Writing
+    component: Writing,
+    meta: { title: '论文写作' }
   },
   {
     path: '/check',
     name: 'check',
-    component: Check
+    component: Check,
+    meta: { title: '论文查重' }
   },
   {
     path: '/rewrite',
     name: 'rewrite',
-    component: Rewrite
+    component: Rewrite,
+    meta: { title: '降重复写' }
   },
   {
     path: '/promote',
     name: 'promote',
-    component: Promote
+    component: Promote,
+    meta: { title: '推广赚钱' }
   },
   {
     path: '/download',
     name: 'download',
-    component: Download
+    component: Download,
+    meta: { title: '报告下载' }
   },
   {
     path: '/news',
     name: 'news',
-    component: News
+    component: News,
+    meta: { title: '行业资讯' }
   }
 ]
 
@@ -53,5 +60,8 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-
+router.afterEach((to) => {
+  // 设置标题，使用路由 meta 中的 title
+  document.title = to.meta.title || '默认标题';
+});
 export default router

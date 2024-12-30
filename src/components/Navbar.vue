@@ -12,7 +12,7 @@
         
         <div class="logo-container" @click="goHome">
           <img src="@/assets/logo.png" alt="Logo" class="logo">
-          <span class="logo-text">PaperXie</span>
+          <span class="logo-text">YTAI</span>
         </div>
         <el-menu-item index="home">首页</el-menu-item>
         <el-menu-item index="writing">论文写作</el-menu-item>
