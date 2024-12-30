@@ -117,9 +117,51 @@ export default {
 
 .navbar {
   height: 60px;
-  border: none;
+  border: none !important;
   display: flex;
   align-items: center;
+}
+
+:deep(.el-menu) {
+  border-bottom: none !important;
+}
+
+:deep(.el-menu--horizontal) {
+  border-bottom: none !important;
+}
+
+:deep(.el-menu--horizontal > .el-menu-item.is-active),
+:deep(.el-menu--horizontal > .el-menu-item) {
+  border-bottom: none !important;
+}
+
+:deep(.el-menu-item) {
+  height: 60px;
+  line-height: 60px;
+  font-size: 14px;
+  padding: 0 16px;
+}
+
+:deep(.el-menu-item.is-active) {
+  color: #74b9ff !important;
+  font-weight: bold !important;
+  position: relative;
+}
+
+:deep(.el-menu-item.is-active)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background-color: #74b9ff;
+  border-radius: 2px;
+}
+
+:deep(.el-menu-item):hover {
+  background-color: rgba(116, 185, 255, 0.1) !important;
 }
 
 .logo-container {
@@ -149,54 +191,46 @@ export default {
 }
 
 .avatar {
+  cursor: pointer;
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: white;
+  overflow: hidden;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .avatar:hover {
-  background: rgba(116, 185, 255, 0.1);
+  transform: scale(1.05);
 }
 
-.el-menu-item {
-  font-size: 14px;
-  padding: 0 16px;
-  height: 60px;
-  line-height: 60px;
-}
-
-:deep(.el-menu-item.is-active) {
-  font-weight: bold !important;
-  position: relative;
-}
-
-:deep(.el-menu-item.is-active)::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 2px;
-  background-color: #74b9ff;
-  border-radius: 2px;
-}
-
-:deep(.el-menu-item):hover {
-  background-color: rgba(116, 185, 255, 0.1) !important;
-}
-
-.hot-tag {
-  position: relative;
-  top: -8px;
-  font-size: 12px;
-  color: #f56c6c;
-  margin-left: 2px;
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .nav-container {
+    padding: 0 12px;
+  }
+  
+  .logo-container {
+    padding: 0 12px;
+  }
+  
+  .logo {
+    height: 28px;
+  }
+  
+  .logo-text {
+    font-size: 18px;
+  }
+  
+  :deep(.el-menu-item) {
+    padding: 0 12px;
+  }
+  
+  .navbar-right {
+    padding-right: 12px;
+  }
 }
 </style>
