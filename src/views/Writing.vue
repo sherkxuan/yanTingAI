@@ -68,7 +68,7 @@
                 <p>Progress Tracking</p>
               </div>
             </div>
-            <el-steps :active="1" align-center finish-status="success" class="custom-steps">
+            <el-steps :active="currentStep" align-center finish-status="success" class="custom-steps">
               <el-step 
                 title="标题" 
                 description="输入论文标题" 
@@ -98,7 +98,8 @@
 
           <!-- 表单区域 -->
           <div class="form-container">
-            <div class="form-card">
+            <!-- 第一步：论文信息 -->
+            <div v-if="currentStep === 1" class="form-card">
               <div class="card-header">
                 <div class="header-icon">
                   <i class="el-icon-edit-outline"></i>
@@ -159,12 +160,12 @@
                   <el-input 
                     type="textarea"
                     v-model="research"
-                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    :autosize="{ minRows: 4, maxRows: 15 }"
                     :maxlength="1000"
                     :show-word-limit="false"
-                    
                     resize="none"
                     placeholder="建议输入相关研究思路，方便AI能够更加准确了解你的需求，如关键词，核心思路，观点，研究方法、参考的辅助材料"
+                    class="auto-height-textarea"
                   />
                 </div>
 
@@ -203,10 +204,128 @@
                 </div>
               </div>
 
-              <div class="form-actions">
-                <el-button type="primary" size="large" class="next-button">
-                  <span>下一步</span>
+              <div class="form-footer">
+                <el-button 
+                  type="primary" 
+                  plain
+                  @click="nextStep"
+                  :disabled="!title.trim()"
+                >
+                  下一步
                   <i class="el-icon-arrow-right"></i>
+                </el-button>
+              </div>
+            </div>
+
+            <!-- 第二步：文献选择 -->
+            <div v-if="currentStep === 2" class="form-card">
+              <div class="card-header">
+                <div class="header-icon">
+                  <i class="el-icon-collection"></i>
+                </div>
+                <div class="header-text">
+                  <h3>参考文献</h3>
+                  <p>Reference Literature</p>
+                </div>
+              </div>
+
+              <div class="form-content">
+                <div class="literature-input">
+                  <div class="input-header">
+                    <i class="el-icon-document"></i>
+                    <span>自定义输入文献时，请使用知网查新（引文格式）格式引文</span>
+                    <el-button type="primary" size="small" class="format-btn">
+                      解析按验文献格式
+                    </el-button>
+                  </div>
+                  <el-input
+                    type="textarea"
+                    v-model="customLiterature"
+                    :autosize="{ minRows: 8, maxRows: 15 }"
+                    placeholder="自定义输入文献（本科参考文献15个以上，硕士20个以上，博士30个以上~）"
+                    class="custom-textarea"
+                  />
+                </div>
+
+                <div class="recommended-literature">
+                  <div class="section-title">
+                    <i class="el-icon-collection-tag"></i>
+                    推荐文献
+                  </div>
+                  <div class="literature-items">
+                    <div v-for="(item, index) in recommendedLiterature" 
+                         :key="index" 
+                         class="literature-item">
+                      <el-checkbox 
+                        v-model="item.selected" 
+                        @change="handleLiteratureSelect"
+                        class="item-checkbox"
+                      ></el-checkbox>
+                      <div class="item-content">
+                        <div class="item-tag">学术期刊</div>
+                        <div class="item-title">{{ item.title }}</div>
+                        <div class="item-abstract">摘要：{{ item.abstract }}</div>
+                        <div class="item-meta">
+                          <div class="meta-left">
+                            <span class="keywords" v-if="item.keywords">
+                              关键词：
+                              <el-tag 
+                                v-for="(keyword, kidx) in item.keywords" 
+                                :key="kidx"
+                                size="small"
+                                class="keyword-tag"
+                              >
+                                {{ keyword }}
+                              </el-tag>
+                            </span>
+                          </div>
+                          <div class="meta-right">
+                            <span class="author">{{ item.author }}</span>
+                            <span class="journal">{{ item.journal }}</span>
+                            <span class="year">{{ item.year }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 底部操作栏 -->
+                  <div class="literature-footer">
+                    <div class="footer-left">
+                      <el-checkbox 
+                        v-model="selectAll"
+                        @change="handleSelectAll"
+                      >已选择文献{{ selectedCount }}个</el-checkbox>
+                      <div class="requirement-tip">
+                        <i class="el-icon-info"></i>
+                        本科参考文献15个以上，硕士20个以上，博士30个以上~
+                      </div>
+                    </div>
+                    <div class="footer-right">
+                      <el-button type="primary" size="small">
+                        添加英文
+                      </el-button>
+                      <el-button type="primary" size="small">
+                        搜索
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-footer">
+                <el-button 
+                  type="primary" 
+                  plain
+                  @click="prevStep"
+                >
+                  上一步
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="nextStep"
+                >
+                  下一步
                 </el-button>
               </div>
             </div>
@@ -228,13 +347,42 @@ export default {
   data() {
     return {
       activeMenu: '1',
+      currentStep: 1,
       title: '',
       research: '',
       language: 'chinese',
       education: 'bachelor',
+      customLiterature: '',
+      recommendedLiterature: [
+        {
+          type: '学术期刊',
+          title: 'AI运用于享乐艺术传播的可能性初探',
+          abstract: '从中国古代"口传心授"的音乐传播基本模式分析,到近代声音记录、电子媒介对于音乐的传播影响梳理,享乐艺术传播的媒介发生翻天覆地转变;随着计算机音乐和人工智能技术逐渐在音乐领域的应用,人机互动式"教学辅助平台应运而生。探索AI技术运用于享乐艺术传播的可能性,反映了二十一世纪科技与艺术深度融合的发展趋势。',
+          keywords: ['AI', '音乐艺术', '传播'],
+          author: '孟文武',
+          journal: '黄河之声',
+          year: '2021',
+          selected: false
+        },
+        {
+          type: '学术期刊',
+          title: '中国移动邓超:运营融合和规模落地是运营商AI运用关键',
+          abstract: '依托九天人工智能平台,中国移动已经开始面向客服、网络、市场、管理和衍生业务领域落地AI规模化应用。从2017年底推出九天人工智能平台,到今年8月客服系统中机器服务的比例达到20%,再到积极推动开放网络自动化平台(ONAP)工作,毫无疑问,在落地AI方面,中国移动走在了全球运营商的前列。',
+          author: '舒文琼',
+          journal: '通信世界',
+          year: '2018',
+          selected: false
+        }
+      ],
+      selectAll: false,
       showTopics: false,
       suggestedTopics: [],
       selectedTopic: null
+    }
+  },
+  computed: {
+    selectedCount() {
+      return this.recommendedLiterature.filter(item => item.selected).length
     }
   },
   methods: {
@@ -243,40 +391,59 @@ export default {
       this.showTopics = false
     },
     generateTopics() {
-      // 模拟API调用，生成预选项
-      this.suggestedTopics = [
-        {
-          title: '基于深度学习的图像识别技术研究与应用',
-          description: '研究深度学习在图像识别领域的应用，包括卷积神经网络模型的优化和实际场景应用',
-          selected: false
-        },
-        {
-          title: '智能物联网在智慧城市中的应用研究',
-          description: '探讨物联网技术在城市管理、交通控制等方面的应用及其效果分析',
-          selected: false
-        },
-        {
-          title: '区块链技术在供应链金融中的应用研究',
-          description: '研究区块链如何提升供应链金融的效率和安全性，并分析实际案例',
-          selected: false
-        }
-      ]
       this.showTopics = true
+      // 模拟API调用
+      setTimeout(() => {
+        this.suggestedTopics = [
+          {
+            title: 'AI在教育领域的应用研究与展望',
+            description: '探讨人工智能技术在教育领域的具体应用场景、实施效果及未来发展趋势。',
+            selected: false
+          },
+          {
+            title: 'AI辅助教学系统的设计与实现',
+            description: '基于人工智能技术，设计并实现一个智能教学辅助系统，提升教学效率和学习效果。',
+            selected: false
+          },
+          {
+            title: 'AI个性化学习推荐系统研究',
+            description: '研究基于人工智能的个性化学习内容推荐算法，为学习者提供定制化的学习路径。',
+            selected: false
+          }
+        ]
+      }, 1000)
     },
     refreshTopics() {
-      // 模拟刷新预选项
       this.generateTopics()
     },
     selectTopic(topic) {
-      // 选择预选项
-      this.suggestedTopics.forEach(t => t.selected = false)
+      this.suggestedTopics.forEach(t => {
+        t.selected = false
+      })
       topic.selected = true
       this.title = topic.title
-      this.research = topic.description
-      // 选择后隐藏预选项区域
+      this.selectedTopic = topic
       setTimeout(() => {
         this.showTopics = false
       }, 300) // 添加短暂延迟，让用户看到选中效果
+    },
+    nextStep() {
+      if (this.currentStep < 4) {
+        this.currentStep++
+      }
+    },
+    prevStep() {
+      if (this.currentStep > 1) {
+        this.currentStep--
+      }
+    },
+    handleLiteratureSelect() {  
+      this.selectAll = this.recommendedLiterature.every(item => item.selected)
+    },
+    handleSelectAll(val) {
+      this.recommendedLiterature.forEach(item => {
+        item.selected = val
+      })
     }
   },
   created() {
@@ -371,7 +538,7 @@ export default {
 
 .menu-header {
   padding: 16px;
-  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  background: linear-gradient(135deg, #74b9ff 0%, #5ca8ff 100%);
   color: white;
 }
 
@@ -399,7 +566,7 @@ export default {
 
 .menu-item-content i {
   font-size: 16px;
-  color: #1890ff;
+  color: #74b9ff;
 }
 
 .gradient-hover {
@@ -410,7 +577,7 @@ export default {
 }
 
 .gradient-hover:hover {
-  background: linear-gradient(to right, rgba(24, 144, 255, 0.1), transparent);
+  background: linear-gradient(to right, rgba(116, 185, 255, 0.1), transparent);
 }
 
 .fire-tag {
@@ -435,7 +602,7 @@ export default {
 
 .card-header {
   padding: 16px;
-  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  background: linear-gradient(135deg, #74b9ff 0%, #5ca8ff 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -470,7 +637,7 @@ export default {
 
 /* Steps Styles */
 .custom-steps {
-  padding: 24px 16px;
+  padding: 20px 0;
 }
 
 .step-item {
@@ -491,7 +658,16 @@ export default {
 
 :deep(.el-step__title) {
   font-size: 14px;
-  color: #606266;
+  color: #909399;
+}
+
+:deep(.el-step__title.is-process) {
+  color: #74b9ff;
+  font-weight: bold;
+}
+
+:deep(.el-step__title.is-success) {
+  color: #74b9ff;
 }
 
 :deep(.el-step__description) {
@@ -499,46 +675,47 @@ export default {
   color: #909399;
 }
 
+:deep(.el-step__description.is-process) {
+  color: #74b9ff;
+}
+
+:deep(.el-step__description.is-success) {
+  color: #74b9ff;
+}
+
 :deep(.el-step__head.is-process) {
-  color: #1890ff;
-  border-color: #1890ff;
+  color: #74b9ff;
+  border-color: #74b9ff;
 }
 
-:deep(.el-step__head.is-process .el-step__icon) {
-  background-color: #fff;
-  border-color: #1890ff;
+:deep(.el-step__icon.is-text) {
+  border-color: #74b9ff;
+  color: #74b9ff;
 }
 
-:deep(.el-step__head.is-process .el-step__icon-inner) {
-  color: #1890ff;
+:deep(.el-step__line) {
+  background-color: #e4e7ed;
 }
 
-:deep(.el-step__head.is-finish) {
-  color: #1890ff;
-  border-color: #1890ff;
+:deep(.el-step__line.is-process) {
+  background-color: #74b9ff;
 }
 
-:deep(.el-step__head.is-finish .el-step__icon) {
-  background-color: #fff;
-  border-color: #1890ff;
+:deep(.el-step.is-success .el-step__line) {
+  background-color: #74b9ff;
 }
 
-:deep(.el-step__head.is-finish .el-step__icon-inner) {
-  color: #1890ff;
+:deep(.el-step__head.is-success) {
+  color: #74b9ff;
+  border-color: #74b9ff;
 }
 
-:deep(.el-step__head.is-finish .el-step__line) {
-  background-color: #1890ff;
+:deep(.el-step__icon-inner) {
+  font-weight: bold;
 }
 
-:deep(.el-step__title.is-process) {
-  color: #1890ff;
-  font-weight: 500;
-}
-
-:deep(.el-step__title.is-finish) {
-  color: #1890ff;
-  font-weight: 500;
+:deep(.el-step.is-horizontal .el-step__line) {
+  height: 2px;
 }
 
 /* Form Styles */
@@ -569,7 +746,7 @@ export default {
 
 .smart-button {
   position: relative;
-  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  background: linear-gradient(135deg, #74b9ff 0%, #5ca8ff 100%);
   border: none;
   padding: 0 16px;
   height: 36px;
@@ -635,9 +812,9 @@ export default {
 }
 
 :deep(.el-radio-button__orig-radio:checked + .el-radio-button__inner) {
-  background: #1890ff;
-  border-color: #1890ff;
-  box-shadow: -1px 0 0 0 #1890ff;
+  background: #74b9ff;
+  border-color: #74b9ff;
+  box-shadow: -1px 0 0 0 #74b9ff;
   color: white;
 }
 
@@ -646,17 +823,12 @@ export default {
 }
 
 :deep(.el-radio-button:first-child:hover .el-radio-button__inner) {
-  border-color: #1890ff;
+  border-color: #74b9ff;
 }
 
 :deep(.el-radio-button:hover .el-radio-button__inner) {
-  color: #1890ff;
-  border-color: #1890ff;
-}
-
-/* 确保选中状态下悬浮时文字保持白色 */
-:deep(.el-radio-button__orig-radio:checked + .el-radio-button__inner:hover) {
-  color: white;
+  color: #74b9ff;
+  border-color: #74b9ff;
 }
 
 :deep(.el-radio-button__orig-radio:disabled + .el-radio-button__inner) {
@@ -675,7 +847,7 @@ export default {
 }
 
 :deep(.el-radio-button:hover .el-radio-button__inner i) {
-  color: #1890ff;
+  color: #74b9ff;
 }
 
 /* 确保选中状态下悬浮时图标保持白色 */
@@ -695,7 +867,7 @@ export default {
 }
 
 .next-button {
-  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  background: linear-gradient(135deg, #74b9ff 0%, #5ca8ff 100%);
   border: none;
   padding: 0 24px;
   height: 36px;
@@ -723,12 +895,12 @@ export default {
 }
 
 :deep(.el-textarea__inner:hover) {
-  border-color: #1890ff;
+  border-color: #74b9ff;
 }
 
 :deep(.el-textarea__inner:focus) {
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+  border-color: #74b9ff;
+  box-shadow: 0 0 0 2px rgba(116, 185, 255, 0.1);
 }
 
 :deep(.el-input__count) {
@@ -809,7 +981,7 @@ export default {
 }
 
 .refresh-btn {
-  color: #1890ff;
+  color: #74b9ff;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -843,9 +1015,9 @@ export default {
 }
 
 .topic-title {
-  color: #1f2937;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
+  color: #1f2937;
   margin-bottom: 4px;
   line-height: 1.4;
 }
@@ -857,8 +1029,221 @@ export default {
 }
 
 .topic-item i {
-  color: #1890ff;
+  color: #74b9ff;
   font-size: 16px;
   margin-top: 2px;
+}
+
+/* 自适应文本框样式 */
+.auto-height-textarea {
+  :deep(.el-textarea__inner) {
+    transition: all 0.3s;
+    line-height: 1.6;
+    padding: 12px;
+  }
+  
+  :deep(.el-input__count) {
+    background: transparent;
+    right: 10px;
+    bottom: 10px;
+    font-size: 12px;
+    color: #909399;
+  }
+}
+
+.form-footer {
+  margin: 40px 0;
+  padding-top: 20px;
+  border-top: 1px solid #ebeef5;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  :deep(.el-button) {
+    min-width: 120px;
+    height: 40px;
+    font-size: 14px;
+
+    &.el-button--primary {
+      background-color: #74b9ff;
+      border-color: #74b9ff;
+
+      &.is-plain {
+        background: #fff;
+        color: #74b9ff;
+        border-color: #74b9ff;
+
+        &:hover {
+          background: #ecf5ff;
+          border-color: #74b9ff;
+          color: #74b9ff;
+        }
+      }
+
+      &:hover {
+        background: #85c2ff;
+        border-color: #85c2ff;
+      }
+    }
+  }
+}
+
+.literature-input {
+  margin-bottom: 30px;
+}
+
+.input-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  color: #333;
+  
+  i {
+    margin-right: 8px;
+    color: #74b9ff;
+  }
+  
+  .format-btn {
+    margin-left: auto;
+  }
+}
+
+.custom-textarea {
+  :deep(.el-textarea__inner) {
+    border: 1px dashed #dcdfe6;
+    background-color: #fafafa;
+  }
+}
+
+.recommended-literature {
+  margin-top: 30px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  
+  i {
+    margin-right: 8px;
+    color: #74b9ff;
+  }
+}
+
+.literature-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.literature-item {
+  position: relative;
+  padding: 20px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.3s;
+  display: flex;
+  gap: 16px;
+  
+  &:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.item-checkbox {
+  margin-top: 4px;
+}
+
+.item-content {
+  flex: 1;
+}
+
+.item-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #e6f3ff;
+  color: #74b9ff;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.item-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.item-abstract {
+  color: #606266;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.item-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #909399;
+  
+  .meta-left {
+    .keywords {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .keyword-tag {
+      background-color: #f0f2f5;
+      border: none;
+      color: #606266;
+    }
+  }
+  
+  .meta-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.literature-footer {
+  margin-top: 20px;
+  padding: 16px 0;
+  border-top: 1px solid #ebeef5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-right {
+  display: flex;
+  gap: 8px;
+}
+
+.requirement-tip {
+  color: #909399;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  
+  i {
+    margin-right: 4px;
+    color: #74b9ff;
+  }
 }
 </style>

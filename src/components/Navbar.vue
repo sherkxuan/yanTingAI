@@ -8,18 +8,19 @@
         class="navbar"
         background-color="#fff"
         text-color="#333"
-        active-text-color="#74b9ff">
+        >
         
         <div class="logo-container" @click="goHome">
           <img src="@/assets/logo.png" alt="Logo" class="logo">
           <span class="logo-text">PaperXie</span>
         </div>
-        <el-menu-item index="1">论文写作</el-menu-item>
-        <el-menu-item index="2">论文查重</el-menu-item>
-        <el-menu-item index="3">降重复写</el-menu-item>
-        <el-menu-item index="4">推广赚钱</el-menu-item>
-        <el-menu-item index="5">报告下载</el-menu-item>
-        <el-menu-item index="6">行业资讯</el-menu-item>
+        <el-menu-item index="home">首页</el-menu-item>
+        <el-menu-item index="writing">论文写作</el-menu-item>
+        <el-menu-item index="check">论文查重</el-menu-item>
+        <el-menu-item index="rewrite">降重复写</el-menu-item>
+        <el-menu-item index="promote">推广赚钱</el-menu-item>
+        <el-menu-item index="download">报告下载</el-menu-item>
+        <el-menu-item index="news">行业资讯</el-menu-item>
         
         <div class="navbar-right">
           <div class="avatar">
@@ -41,20 +42,26 @@ export default {
   name: 'Navbar',
   data() {
     return {
-      activeMenu: '1',
+      activeMenu: 'home',
       routeMap: {
-        '1': { path: '/writing', query: { type: 'thesis' } },
-        '2': { path: '/check' },
-        '3': { path: '/rewrite' },
-        '4': { path: '/promote' },
-        '5': { path: '/download' },
-        '6': { path: '/news' }
+        'home': { path: '/'},
+        'writing': { path: '/writing'},
+        'check': { path: '/check' },
+        'rewrite': { path: '/rewrite' },
+        'promote': { path: '/promote' },
+        'download': { path: '/download' },
+        'news': { path: '/news' }
       }
     }
   },
   created() {
     // 根据当前路由设置激活项
-    this.activeMenu = this.$route.path
+    const currentPath = this.$route.path
+    // 找到对应的菜单key
+    const menuKey = Object.keys(this.routeMap).find(key => 
+      this.routeMap[key].path === currentPath
+    ) || 'home'
+    this.activeMenu = menuKey
   },
   methods: {
     handleSelect(key) {
@@ -74,13 +81,18 @@ export default {
           throw err
         }
       })
-      this.activeMenu = '/'
+      this.activeMenu = 'home'
     }
   },
   watch: {
     // 监听路由变化
     '$route'(to) {
-      this.activeMenu = to.path
+      const currentPath = to.path
+      // 找到对应的菜单key
+      const menuKey = Object.keys(this.routeMap).find(key => 
+        this.routeMap[key].path === currentPath
+      ) || 'home'
+      this.activeMenu = menuKey
     }
   }
 }
@@ -157,6 +169,27 @@ export default {
   padding: 0 16px;
   height: 60px;
   line-height: 60px;
+}
+
+:deep(.el-menu-item.is-active) {
+  font-weight: bold !important;
+  position: relative;
+}
+
+:deep(.el-menu-item.is-active)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background-color: #74b9ff;
+  border-radius: 2px;
+}
+
+:deep(.el-menu-item):hover {
+  background-color: rgba(116, 185, 255, 0.1) !important;
 }
 
 .hot-tag {
