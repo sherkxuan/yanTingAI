@@ -1,131 +1,157 @@
 <!-- PreviewProgress.vue -->
 <template>
-  <div class="form-card">
-    <div class="card-header">
-      <div class="header-icon">
-        <i class="el-icon-document"></i>
+  <div class="preview-progress">
+    <div class="form-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="el-icon-document"></i>
+        </div>
+        <div class="header-text">
+          <h3>预览与下载</h3>
+          <p>Preview & Download</p>
+        </div>
       </div>
-      <div class="header-text">
-        <h3>预览与下载</h3>
-        <p>Preview & Download</p>
-      </div>
-    </div>
 
-    <div class="preview-content">
-      <!-- 预览区域 -->
-      <div class="preview-area">
-        <!-- A4 纸张预览 -->
-        <div class="paper">
-          <!-- 标题 -->
-          <div class="paper-title">
-            <h1>{{ title || '论文标题' }}</h1>
-          </div>
+      <div class="preview-content">
+        <!-- 预览区域 -->
+        <div class="preview-area">
+          <!-- A4 纸张预览 -->
+          <div class="paper">
+            <!-- 标题 -->
+            <div class="paper-title">
+              <h1>{{ title || '论文标题' }}</h1>
+            </div>
 
-          <!-- 作者信息 -->
-          <div class="author-info">
-            <p>作者：{{ authorName || '未填写' }}</p>
-            <p>学号：{{ studentId || '未填写' }}</p>
-            <p>专业：{{ major || '未填写' }}</p>
-            <p>指导教师：{{ supervisor || '未填写' }}</p>
-          </div>
+            <!-- 作者信息 -->
+            <div class="author-info">
+              <p>作者：{{ authorName || '未填写' }}</p>
+              <p>学号：{{ studentId || '未填写' }}</p>
+              <p>专业：{{ major || '未填写' }}</p>
+              <p>指导教师：{{ supervisor || '未填写' }}</p>
+            </div>
 
-          <!-- 摘要 -->
-          <div class="abstract">
-            <h2>摘要</h2>
-            <p>{{ abstract || '摘要内容...' }}</p>
-            <p class="keywords">关键词：{{ keywords.join('；') || '关键词1；关键词2；关键词3' }}</p>
-          </div>
+            <!-- 摘要 -->
+            <div class="abstract">
+              <h2>摘要</h2>
+              <p>{{ abstract || '摘要内容...' }}</p>
+              <p class="keywords">关键词：{{ keywords.join('；') || '关键词1；关键词2；关键词3' }}</p>
+            </div>
 
-          <!-- 目录 -->
-          <div class="table-of-contents">
-            <h2>目录</h2>
-            <div class="toc-item" v-for="(item, index) in outline" :key="index">
-              <span class="toc-number">{{ generateNumber(item.level, index) }}</span>
-              <span class="toc-title">{{ item.label }}</span>
-              <span class="toc-dots"></span>
-              <span class="toc-page">{{ index + 1 }}</span>
+            <!-- 目录 -->
+            <div class="table-of-contents">
+              <h2>目录</h2>
+              <div class="toc-item" v-for="(item, index) in outline" :key="index">
+                <span class="toc-number">{{ generateNumber(item.level, index) }}</span>
+                <span class="toc-title">{{ item.label }}</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page">{{ index + 1 }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 操作区域 -->
-      <div class="actions-area">
-        <div class="format-settings">
-          <h3>排版设置</h3>
-          <div class="setting-item">
-            <span>页边距</span>
-            <el-tooltip placement="left" open-delay="500">
-              <template #content>
-                <div class="margin-tooltip">
-                  <p><strong>窄：</strong>上下 1.91cm，左右 1.91cm</p>
-                  <p><strong>普通：</strong>上下 2.54cm，左右 3.18cm</p>
-                  <p><strong>适中：</strong>上下 2.54cm，左右 1.91cm</p>
-                  <p><strong>宽：</strong>上下 2.54cm，左右 5.08cm</p>
-                </div>
-              </template>
-              <el-select v-model="margin" size="small" @change="updateMargins">
-                <el-option label="窄" value="narrow"></el-option>
-                <el-option label="普通" value="normal"></el-option>
-                <el-option label="适中" value="moderate"></el-option>
-                <el-option label="宽" value="wide"></el-option>
+        <!-- 操作区域 -->
+        <div class="actions-area">
+          <div class="format-settings">
+            <h3>排版设置</h3>
+            <div class="setting-item">
+              <span>页边距</span>
+              <el-tooltip placement="left" :open-delay="500">
+                <template #content>
+                  <div class="margin-tooltip">
+                    <p><strong>窄：</strong>上下 1.91cm，左右 1.91cm</p>
+                    <p><strong>普通：</strong>上下 2.54cm，左右 3.18cm</p>
+                    <p><strong>适中：</strong>上下 2.54cm，左右 1.91cm</p>
+                    <p><strong>宽：</strong>上下 2.54cm，左右 5.08cm</p>
+                  </div>
+                </template>
+                <el-select v-model="margin" size="small" @change="updateMargins">
+                  <el-option label="窄" value="narrow"></el-option>
+                  <el-option label="普通" value="normal"></el-option>
+                  <el-option label="适中" value="moderate"></el-option>
+                  <el-option label="宽" value="wide"></el-option>
+                </el-select>
+              </el-tooltip>
+            </div>
+            <div class="setting-item">
+              <span>标题编号</span>
+              <el-tooltip placement="right" :open-delay="500">
+                <template #content>
+                  <div class="numbering-tooltip">
+                    <p><strong>数字：</strong>1、1.1、1.1.1</p>
+                    <p><strong>中文1：</strong>一、（一）、1</p>
+                    <p><strong>中文2：</strong>第一章、第一节、1</p>
+                    <p><strong>中文3：</strong>第一章、1、1.1</p>
+                  </div>
+                </template>
+                <el-select v-model="titleNumbering" size="small">
+                  <el-option label="数字" value="decimal"></el-option>
+                  <el-option label="中文1" value="chinese"></el-option>
+                  <el-option label="中文2" value="chapter"></el-option>
+                  <el-option label="中文3" value="mixed"></el-option>
+                </el-select>
+              </el-tooltip>
+            </div>
+            <div class="setting-item">
+              <span>文字样式</span>
+              <el-select v-model="currentStyle" size="small" @change="handleStyleChange">
+                <el-option label="正文" value="normal"></el-option>
+                <el-option label="标题1" value="heading1"></el-option>
+                <el-option label="标题2" value="heading2"></el-option>
+                <el-option label="标题3" value="heading3"></el-option>
               </el-select>
-            </el-tooltip>
+              <el-button size="small" @click="openStyleDialog">
+                <i class="el-icon-setting"></i>
+              </el-button>
+            </div>
           </div>
-          <div class="setting-item">
-            <span>标题编号</span>
-            <el-tooltip placement="right" open-delay="500">
-              <template #content>
-                <div class="numbering-tooltip">
-                  <p><strong>数字：</strong>1、1.1、1.1.1</p>
-                  <p><strong>中文1：</strong>一、（一）、1</p>
-                  <p><strong>中文2：</strong>第一章、第一节、1</p>
-                  <p><strong>中文3：</strong>第一章、1、1.1</p>
-                </div>
-              </template>
-              <el-select v-model="titleNumbering" size="small">
-                <el-option label="数字" value="decimal"></el-option>
-                <el-option label="中文1" value="chinese"></el-option>
-                <el-option label="中文2" value="chapter"></el-option>
-                <el-option label="中文3" value="mixed"></el-option>
-              </el-select>
-            </el-tooltip>
+
+          <div class="download-options">
+            <h3>导出选项</h3>
+            <el-radio-group v-model="exportFormat" size="small">
+              <el-radio-button label="docx">Word</el-radio-button>
+              <el-radio-button label="pdf">PDF</el-radio-button>
+            </el-radio-group>
+            <el-button type="primary" @click="handleDownload" class="download-btn">
+              下载文档
+            </el-button>
           </div>
         </div>
+      </div>
 
-        <div class="download-options">
-          <h3>导出选项</h3>
-          <el-radio-group v-model="exportFormat" size="small">
-            <el-radio-button label="docx">Word</el-radio-button>
-            <el-radio-button label="pdf">PDF</el-radio-button>
-          </el-radio-group>
-          <el-button type="primary" @click="handleDownload" class="download-btn">
-            下载文档
-          </el-button>
-        </div>
+      <div class="form-footer">
+        <el-button 
+          type="primary" 
+          plain
+          @click="$emit('prev')"
+        >
+          上一步
+        </el-button>
+        <el-button 
+          type="primary" 
+          @click="$emit('next')"
+        >
+          完成
+        </el-button>
       </div>
     </div>
-
-    <div class="form-footer">
-      <el-button 
-        type="primary" 
-        plain
-        @click="$emit('prev')"
-      >
-        上一步
-      </el-button>
-      <el-button 
-        type="primary" 
-        @click="$emit('next')"
-      >
-        完成
-      </el-button>
-    </div>
+    
+    <!-- 文字样式设置对话框 -->
+    <TextStyleDialog
+      :visible.sync="styleDialogVisible"
+      :initial-style="currentStyleConfig"
+      @confirm="handleStyleConfirm"
+    />
   </div>
 </template>
 
 <script>
+import TextStyleDialog from './TextStyleDialog.vue'
+
 export default {
+  components: {
+    TextStyleDialog
+  },
   name: 'PreviewProgress',
   data() {
     return {
@@ -141,8 +167,84 @@ export default {
 
       // 排版设置
       margin: 'normal', // 默认使用普通边距
+      marginSettings: {
+        narrow: {
+          top: '1.91cm',
+          right: '1.91cm',
+          bottom: '1.91cm',
+          left: '1.91cm'
+        },
+        normal: {
+          top: '2.54cm',
+          right: '3.18cm',
+          bottom: '2.54cm',
+          left: '3.18cm'
+        },
+        moderate: {
+          top: '2.54cm',
+          right: '1.91cm',
+          bottom: '2.54cm',
+          left: '1.91cm'
+        },
+        wide: {
+          top: '2.54cm',
+          right: '5.08cm',
+          bottom: '2.54cm',
+          left: '5.08cm'
+        }
+      },
       titleNumbering: 'decimal', // 新增标题编号样式选项
-      exportFormat: 'docx'
+      exportFormat: 'docx',
+      // 文字样式设置
+      currentStyle: 'normal',
+      styleDialogVisible: false,
+      styleConfigs: {
+        normal: {
+          fontFamily: 'SimSun',
+          fontSize: '12',
+          fontWeight: 'normal',
+          lineHeight: '1.5',
+          textAlign: 'justify',
+          textIndent: '2em',
+          marginTop: 0,
+          marginBottom: 0
+        },
+        heading1: {
+          fontFamily: 'SimHei',
+          fontSize: '16',
+          fontWeight: 'bold',
+          lineHeight: '1.5',
+          textAlign: 'center',
+          textIndent: '0',
+          marginTop: 1,
+          marginBottom: 1
+        },
+        heading2: {
+          fontFamily: 'SimHei',
+          fontSize: '14',
+          fontWeight: 'bold',
+          lineHeight: '1.5',
+          textAlign: 'left',
+          textIndent: '0',
+          marginTop: 1,
+          marginBottom: 1
+        },
+        heading3: {
+          fontFamily: 'SimHei',
+          fontSize: '12',
+          fontWeight: 'bold',
+          lineHeight: '1.5',
+          textAlign: 'left',
+          textIndent: '0',
+          marginTop: 1,
+          marginBottom: 1
+        }
+      }
+    }
+  },
+  computed: {
+    currentStyleConfig() {
+      return this.styleConfigs[this.currentStyle] || this.styleConfigs.normal
     }
   },
   methods: {
@@ -190,6 +292,17 @@ export default {
           return `${index + 1}、`; // 默认使用数字编号
       }
     },
+    openStyleDialog() {
+      this.styleDialogVisible = true
+    },
+    handleStyleChange(value) {
+      // 当选择不同的样式时触发
+      this.currentStyle = value
+    },
+    handleStyleConfirm(styleConfig) {
+      // 当确认样式设置时触发
+      this.styleConfigs[this.currentStyle] = { ...styleConfig }
+    }
   },
   mounted() {
     this.updateMargins(); // 初始化页边距
@@ -202,7 +315,7 @@ export default {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  height: calc(100vh - 300px);
+  /* height: calc(100vh - 300px); */
   display: flex;
   flex-direction: column;
 }
@@ -346,10 +459,11 @@ export default {
 }
 
 .actions-area {
-  width: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  width: 300px;
+  padding: 20px 10px;
+  background-color: #f5f7fa;
+  border-left: 1px solid #e4e7ed;
+  overflow-y: auto;
 }
 
 .format-settings, .download-options {
@@ -368,7 +482,7 @@ export default {
 .setting-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
