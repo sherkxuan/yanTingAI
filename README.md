@@ -1,4 +1,4 @@
-# my-vue-app
+# AI论文辅助平台
 
 ## Project setup
 ```

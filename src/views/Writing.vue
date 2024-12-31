@@ -68,7 +68,7 @@
                 <p>Progress Tracking</p>
               </div>
             </div>
-            <el-steps :active="currentStep" align-center finish-status="success" class="custom-steps">
+            <el-steps :active="currentStep" align-center class="custom-steps">
               <el-step 
                 title="标题" 
                 description="输入论文标题" 
@@ -111,6 +111,18 @@
               @prev="prevStep"
               @next="nextStep"
             />
+            <OutlineEditor
+              v-if="currentStep === 3"
+              @prev="prevStep"
+              @next="nextStep"
+              class="outline-editor"
+            />
+            <PreviewProgress
+              v-if="currentStep === 4"
+              @prev="prevStep"
+              @next="nextStep"
+              class="preview-progress"
+            />
           </div>
         </div>
       </div>
@@ -122,13 +134,17 @@
 import Navbar from '@/components/Navbar.vue'
 import TitleProgress from '@/components/TitleProgress.vue'
 import LiteratureProgress from '@/components/LiteratureProgress.vue'
+import OutlineEditor from '@/components/OutlineEditor.vue'
+import PreviewProgress from '@/components/PreviewProgress.vue'
 
 export default {
   name: 'Writing',
   components: {
     Navbar,
     TitleProgress,
-    LiteratureProgress
+    LiteratureProgress,
+    OutlineEditor,
+    PreviewProgress
   },
   data() {
     return {
@@ -157,6 +173,22 @@ export default {
   min-height: 100vh;
   background: #f5f7fa;
   padding-top: 60px;
+}
+
+.outline-editor {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: calc(100vh - 300px);
+  margin-top: 16px;
+}
+
+.preview-progress {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: calc(100vh - 300px);
+  margin-top: 16px;
 }
 
 .main-wrapper {
@@ -237,126 +269,63 @@ export default {
   gap: 16px;
 }
 
-.progress-card, .form-card {
+.progress-card {
   background: white;
   border-radius: 8px;
+  padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
 }
 
 .card-header {
-  padding: 16px;
-  background: linear-gradient(135deg, #74b9ff 0%, #5ca8ff 100%);
-  color: white;
   display: flex;
   align-items: center;
-  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .header-icon {
-  display: flex;
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #74b9ff 0%, #5ca8ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
 }
 
 .header-icon i {
-  font-size: 18px;
+  color: white;
+  font-size: 20px;
 }
 
 .header-text h3 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  color: #333;
 }
 
 .header-text p {
-  font-size: 12px;
-  margin: 2px 0 0;
-  opacity: 0.8;
-}
-
-/* Steps Styles */
-.custom-steps {
-  padding: 20px 0;
-}
-
-.step-item {
-  transition: all 0.3s ease;
-}
-
-/* 自定义 el-step 样式 */
-:deep(.el-step__icon) {
-  width: 32px;
-  height: 32px;
-  border: 2px solid #e4e7eb;
-  border-radius: 10px;
-}
-
-:deep(.el-step__line) {
-  background-color: #e4e7eb;
-}
-
-:deep(.el-step__title) {
+  margin: 4px 0 0;
   font-size: 14px;
   color: #909399;
 }
 
-:deep(.el-step__title.is-process) {
-  color: #74b9ff;
-  font-weight: bold;
+/* 自定义步骤条样式 */
+.custom-steps {
+  padding: 0 20px;
 }
 
-:deep(.el-step__title.is-success) {
-  color: #74b9ff;
+:deep(.el-step__head.is-success .el-step__icon) {
+  background-color: #67C23A;
+  border-color: #67C23A;
 }
 
-:deep(.el-step__description) {
-  font-size: 12px;
-  color: #909399;
+:deep(.el-step__head.is-success .el-step__icon i) {
+  color: white;
 }
 
-:deep(.el-step__description.is-process) {
-  color: #74b9ff;
-}
-
-:deep(.el-step__head.is-process) {
-  color: #74b9ff;
-  border-color: #74b9ff;
-}
-
-:deep(.el-step__icon.is-text) {
-  border-color: #74b9ff;
-  color: #74b9ff;
-}
-
-:deep(.el-step__line) {
-  background-color: #e4e7ed;
-}
-
-:deep(.el-step__line.is-process) {
-  background-color: #74b9ff;
-}
-
-:deep(.el-step.is-success .el-step__line) {
-  background-color: #74b9ff;
-}
-
-:deep(.el-step__head.is-success) {
-  color: #74b9ff;
-  border-color: #74b9ff;
-}
-
-:deep(.el-step__icon-inner) {
-  font-weight: bold;
-}
-
-:deep(.el-step.is-horizontal .el-step__line) {
-  height: 2px;
+:deep(.el-step__head.is-success .el-step__line) {
+  background-color: #67C23A;
 }
 
 /* Responsive Design */

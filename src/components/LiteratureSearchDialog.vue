@@ -6,6 +6,7 @@
     width="80%"
     :before-close="handleClose"
     class="literature-search-dialog"
+    top="10vh"
   >
     <div class="dialog-content">
       <!-- 左侧搜索区域 -->
