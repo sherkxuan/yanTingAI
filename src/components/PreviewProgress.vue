@@ -94,15 +94,17 @@
             </div>
             <div class="setting-item">
               <span>文字样式</span>
-              <el-select v-model="currentStyle" size="small" @change="handleStyleChange">
-                <el-option label="正文" value="normal"></el-option>
-                <el-option label="标题1" value="heading1"></el-option>
-                <el-option label="标题2" value="heading2"></el-option>
-                <el-option label="标题3" value="heading3"></el-option>
-              </el-select>
-              <el-button size="small" @click="openStyleDialog">
-                <i class="el-icon-setting"></i>
-              </el-button>
+              <div>
+                <el-select v-model="currentStyle" size="small" @change="handleStyleChange">
+                  <el-option label="正文" value="normal"></el-option>
+                  <el-option label="标题1" value="heading1"></el-option>
+                  <el-option label="标题2" value="heading2"></el-option>
+                  <el-option label="标题3" value="heading3"></el-option>
+                </el-select>
+                <el-button size="small" @click="openStyleDialog">
+                  <i class="el-icon-setting" ></i>
+                </el-button>
+              </div>
             </div>
           </div>
 
@@ -592,8 +594,8 @@ export default {
   font-size: 13px;
 }
 
-.setting-item :deep(.el-select) {
-  width: 130px;
+.setting-item:last-child :deep(.el-select) {
+  width: 90px;
 }
 
 .style-header {
@@ -603,5 +605,9 @@ export default {
   margin-bottom: 8px;
   padding-bottom: 4px;
   border-bottom: 1px solid #e4e7ed;
+}
+.el-button--small {
+  padding: 9px 9px;
+  margin-left: 8px;
 }
 </style>
