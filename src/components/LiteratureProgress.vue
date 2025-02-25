@@ -17,19 +17,19 @@
           <i class="el-icon-document"></i>
           <span>自定义输入文献时，请使用知网查新（引文格式）格式引文</span>
           <el-button type="primary" size="small" class="format-btn">
-            解析按验文献格式
+            解析校验文献格式
           </el-button>
         </div>
         <el-input
           type="textarea"
           v-model="customLiterature"
           :autosize="{ minRows: 8, maxRows: 15 }"
-          placeholder="自定义输入文献（本科参考文献15个以上，硕士20个以上，博士30个以上~）"
+          placeholder="自定义输入文献（专科参考文献10个以上，本科15个以上，硕士20个以上，博士30个以上~）"
           class="custom-textarea"
         />
       </div>
 
-      <div class="recommended-literature">
+      <div class="recommended-literature" v-if="false">
         <div class="section-title">
           <i class="el-icon-collection-tag"></i>
           推荐文献
@@ -82,7 +82,7 @@
             >已选择文献{{ selectedCount }}个</el-checkbox>
             <div class="requirement-tip">
               <i class="el-icon-info"></i>
-              本科参考文献15个以上，硕士20个以上，博士30个以上~
+              专科参考文献10个以上，本科参考文献15个以上，硕士20个以上，博士30个以上~
             </div>
           </div>
           <div class="footer-right">
